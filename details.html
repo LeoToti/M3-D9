@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+
+    <title>Detail Page</title>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link active" href="index.html"
+            >Home <span class="sr-only">(current)</span></a
+          >
+          <a class="nav-link" href="backoffice.html">Backoffice</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-10 col-md-6 mx-auto">
+          <h1 class="text-center my-5">Event detail</h1>
+
+          <h4 id="name" class="text-center"></h4>
+          <div>
+            <h6>Details:</h6>
+            <p id="description" style="display: inline ;"></p>
+          </div>
+          <div>
+            <p class="d-flex justify-content-between">
+              <strong>Price:</strong>
+              <span id="price"></span>
+            </p>
+          </div>
+          <div>
+            <p class="d-flex justify-content-between">
+              <strong>imgUrl:</strong>
+              <span id="imageUrl"></span>
+            </p>
+          </div>
+
+          <div class="d-flex" id="edit"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id");
+
+      const endpoint = "https://striveschool-api.herokuapp.com/api/product/";
+
+      window.onload = async () => {
+        // document.querySelector('h1').innerHTML += " " + id
+
+        const response = await fetch(endpoint + id, {
+          method: "GET", // "GET", "POST", "PUT", "DELETE"
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDgwMjYyZGIxZjBmYjAwMTVkOTE3YWUiLCJpYXQiOjE2MTkwMTExMTgsImV4cCI6MTYyMDIyMDcxOH0.u4ShYs4n706rvXgmMF96INEy00iaODgcOgey38Up6Hc",
+            "Content-Type": "application/json",
+          },
+        });
+        const event = await response.json();
+
+        console.log(event);
+        displayEvent(event);
+      };
+
+      function displayEvent(event) {
+        document.querySelector("#name").innerHTML = event.name;
+        document.querySelector("#description").innerHTML = event.description;
+        document.querySelector("#price").innerHTML = event.price;
+        document.querySelector("#imageUrl").innerHTML = event.imageUrl;
+
+        document.querySelector("#edit").innerHTML = `
+                <a class="btn btn-primary mx-auto w-50" href="backoffice.html?id=${event._id}">Edit</a>
+            `;
+      }
+    </script>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+-->
+  </body>
+</html>

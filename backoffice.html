@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+            integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    
+        <title>Backoffice!</title>
+    
+        <style>
+            input {
+                margin-bottom: 1em
+            }
+        </style>
+    </head>
+    
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="./index!.html">Home</a>
+                    <a class="nav-link active" href="./backoffice.html">Backoffice <span class="sr-only">(current)</span></a>
+                </div>
+            </div>
+        </nav>
+    
+        <div class="container">
+            <div class="row">
+                <div class="col-10 col-md-6 mx-auto">
+                    <h1 class="text-center my-5">Backoffice</h1>
+                    <h3 id="operation" class="text-center"></h3>
+    
+                    <form onsubmit="handleSubmit(event)">
+    
+                        <!-- 
+                            {
+                                "_id": "6065a236df175c00150ea3ba",          // server-generated
+                                "name": "First event",
+                                "description": "nope",
+                                "price": 1,
+                                "time": "2021-04-01T12:36:00.000Z",
+                                "createdAt": "2021-04-01T10:36:38.067Z",    // server-generated
+                                "updatedAt": "2021-04-01T10:36:38.067Z",    // server-generated
+                                "__v": 0                                    // server-generated
+                            }    
+                        -->
+                        <!--Event Name-->
+                        <label>Product Name</label>
+                        <input id="name" type="text" class="form-control" placeholder="Write here event name">
+    
+                        <!--Event Description-->
+                        <label>Product Description</label>
+                        <input id="description" type="text" class="form-control" placeholder="Write here event description">
+    
+                        <!--Event Price-->
+                        <label>Brand</label>
+                        <input id="brand" type="text" class="form-control" placeholder="Write here event price">
+    
+                        <!--Event Date and time-->
+                        <label>Img Url</label>
+                        <input id="imageUrl" type="img" class="form-control"
+                            placeholder="Write here event date and time">
+    
+                        <label>Price</label>
+                        <input id="price" type="price" class="form-control"
+                                placeholder="Write here event date and time">
+    
+                        <div class="d-flex justify-content-between">
+                            <button type="submit"
+                                class="btn btn-primary w-50 mx-auto d-flex justify-content-center align-items-center">
+                                <span id="spinner" class="d-none spinner-border spinner-border-sm mr-2" role="status"
+                                    aria-hidden="true"></span>
+                                Submit
+                            </button>
+    
+                            <button type="button" id="delete-btn" onclick="deleteEvent()"
+                                class="d-none btn btn-danger text-white mx-auto">
+                                <ion-icon name="trash-outline"></ion-icon>
+                            </button>
+                        </div>
+    
+                    </form>
+    
+                </div>
+            </div>
+        </div>
+    
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id");
+
+      const endpoint = id
+        ? "https://striveschool-api.herokuapp.com/api/product/" + id
+        : "https://striveschool-api.herokuapp.com/api/product/";
+
+      const method = id ? "PUT" : "POST";
+
+      window.onload = async () => {
+        console.log(id);
+
+        if (id) {
+          operation.innerHTML = "Editing event";
+
+          try {
+            const response = await fetch(endpoint, {
+              method: "GET", // "GET", "POST", "PUT", "DELETE"
+              headers: {
+                Authorization:
+                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDgwMjYyZGIxZjBmYjAwMTVkOTE3YWUiLCJpYXQiOjE2MTkwMTExMTgsImV4cCI6MTYyMDIyMDcxOH0.u4ShYs4n706rvXgmMF96INEy00iaODgcOgey38Up6Hc",
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) {
+              if (response.status === 404) {
+                location.assign("index.html");
+                throw new Error("This event does not exist!");
+                // go to catch block
+              }
+              throw new Error(
+                "Something went wrong with code " + response.status
+              );
+              // go to catch block
+            }
+
+            const event = await response.json();
+            populateFields(event);
+          } catch (error) {
+            console.log(error);
+            alert(error.message);
+            // from here, continue
+          }
+
+          document.querySelector("#delete-btn").classList.remove("d-none");
+        } else {
+          operation.innerHTML = "Creating new event";
+        }
+      };
+
+      function populateFields(event) {
+        document.querySelector("#name").value = event.name;
+        document.querySelector("#description").value = event.description;
+        document.querySelector("#price").value = event.price;
+        document.querySelector("#imageUrl").value = event.imageUrl;
+      }
+
+      async function handleSubmit(event) {
+        event.preventDefault();
+        setLoading(true);
+
+        const newEvent = {
+          name: document.querySelector("#name").value,
+          description: document.querySelector("#description").value,
+          price: document.querySelector("#price").value,
+          imageUrl: document.querySelector("#imageUrl").value
+        };
+
+        console.log(newEvent);
+
+        try {
+          const response = await fetch(endpoint, {
+            method, // "GET", "POST", "PUT", "DELETE"
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDgwMjYyZGIxZjBmYjAwMTVkOTE3YWUiLCJpYXQiOjE2MTkwMTExMTgsImV4cCI6MTYyMDIyMDcxOH0.u4ShYs4n706rvXgmMF96INEy00iaODgcOgey38Up6Hc",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newEvent),
+          });
+
+          if (!response.ok) throw new Error("Failed to post");
+
+          const data = await response.json();
+          alert("Event added successfully with id " + data._id);
+        } catch (error) {
+          alert(error.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      function setLoading(loading) {
+        if (loading) {
+          document.querySelector("#spinner").classList.remove("d-none");
+        } else {
+          document.querySelector("#spinner").classList.add("d-none");
+        }
+      }
+
+      async function deleteEvent() {
+        setLoading(true);
+
+        try {
+          const response = await fetch(endpoint, { method: "DELETE" ,
+          headers: {
+                Authorization:
+                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDgwMjYyZGIxZjBmYjAwMTVkOTE3YWUiLCJpYXQiOjE2MTkwMTExMTgsImV4cCI6MTYyMDIyMDcxOH0.u4ShYs4n706rvXgmMF96INEy00iaODgcOgey38Up6Hc",
+                "Content-Type": "application/json",
+              },
+        
+        });
+          if (!response.ok) throw new Error("Something went wrong");
+
+          alert("Event deleted successfully");
+          location.assign("index!.html");
+        } catch (error) {
+          console.log(error);
+          alert(error.message);
+        }
+
+        setLoading(false);
+      }
+    </script>
+  </body>
+</html>
